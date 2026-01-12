@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Equipment | SmartMine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="CSS/style.css">
+</head>
+
+<body class="bg-slate-950 text-slate-200">
+<div class="flex min-h-screen">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar"></div>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-8 bg-gradient-to-br from-slate-950 to-slate-900">
+    <div class="container mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Equipment</h1>
+        <p class="text-slate-400 text-sm">
+          Manage your mining equipment fleet
+        </p>
+      </div>
+
+      <button class="bg-amber-400 text-black px-4 py-2 rounded-lg font-semibold">
+        + Add Equipment
+      </button>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="flex gap-4 mb-8">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search equipment..."
+        class="flex-1 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 outline-none focus:border-amber-400"
+      />
+
+      <select
+        id="statusFilter"
+        class="bg-slate-900 border border-white/10 rounded-lg px-4 py-2">
+        <option value="all">All Status</option>
+        <option value="Good">Good</option>
+        <option value="Warning">Warning</option>
+        <option value="Critical">Critical</option>
+      </select>
+    </div>
+
+    <!-- ✅ EQUIPMENT GRID (THIS WAS THE ISSUE) -->
+    <div
+      id="equipment-list"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
+      <!-- Cards are injected here by equipment.js -->
+    </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- LOAD SIDEBAR -->
+<script type="module">
+  import { loadSidebar } from "./js/layout.js";
+  loadSidebar("equipment");
+</script>
+
+<!-- LOAD PAGE LOGIC -->
+<script src="js/equipment.js"></script>
+</body>
+</html>

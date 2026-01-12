@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerts | SmartMine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-200">
+  <div class="flex min-h-screen">
+    <div id="sidebar"></div>
+    <main class="flex-1 p-8 bg-gradient-to-br from-slate-950 to-slate-900">
+      <h1 class="text-2xl font-bold mb-6">System Alerts</h1>
+      <div id="alert-list" class="space-y-4"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { loadSidebar } from "./js/layout.js";
+    loadSidebar("alerts");
+  </script>
+  <script src="js/alerts.js"></script>
+</body>
+</html>

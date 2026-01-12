@@ -1,0 +1,18 @@
+{
+  "equipment": [
+    {"id":1,"code":"ATL-ST18-005","name":"Atlas Copco ST18","type":"Scooptram","usage_hours":3400,"maintenance_limit":4000,"status":"Warning"},
+    {"id":2,"code":"BEL-B60E-008","name":"Bell B60E","type":"Articulated Truck","usage_hours":6100,"maintenance_limit":5000,"status":"Critical"},
+    {"id":3,"code":"CAT-797F-001","name":"Caterpillar 797F","type":"Haul Truck","usage_hours":4200,"maintenance_limit":5000,"status":"Warning"},
+    {"id":4,"code":"EPI-BM2-006","name":"Epiroc Boomer M2","type":"Face Drill","usage_hours":2900,"maintenance_limit":3000,"status":"Warning"},
+    {"id":5,"code":"HIT-EX8000-007","name":"Hitachi EX8000","type":"Excavator","usage_hours":1800,"maintenance_limit":2500,"status":"Good"},
+    {"id":6,"code":"KOM-PC8000-002","name":"Komatsu PC8000","type":"Excavator","usage_hours":4850,"maintenance_limit":5000,"status":"Warning"},
+    {"id":7,"code":"LIE-T284-003","name":"Liebherr T 284","type":"Haul Truck","usage_hours":5200,"maintenance_limit":5000,"status":"Critical"},
+    {"id":8,"code":"SAN-DD422-004","name":"Sandvik DD422i","type":"Drill Jumbo","usage_hours":2100,"maintenance_limit":3000,"status":"Good"}
+  ],
+  "dashboard_summary": {
+    "total": 8,
+    "good": 2,
+    "warning": 4,
+    "critical": 2
+  }
+}
