@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Equipment | SmartMine</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="CSS/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body class="bg-slate-950 text-slate-200">
@@ -14,11 +14,9 @@
   <!-- SIDEBAR -->
   <div id="sidebar"></div>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <main class="flex-1 p-8 bg-gradient-to-br from-slate-950 to-slate-900">
-    <div class="container mx-auto">
 
-    <!-- HEADER -->
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold">Equipment</h1>
@@ -27,12 +25,11 @@
         </p>
       </div>
 
-      <button class="bg-amber-400 text-black px-4 py-2 rounded-lg font-semibold">
+      <button id="openAddModal" class="bg-amber-400 text-black px-4 py-2 rounded-lg font-semibold hover:bg-amber-500 transition">
         + Add Equipment
       </button>
     </div>
 
-    <!-- TOOLBAR -->
     <div class="flex gap-4 mb-8">
       <input
         id="searchInput"
@@ -51,22 +48,335 @@
       </select>
     </div>
 
-    <!-- ✅ EQUIPMENT GRID (THIS WAS THE ISSUE) -->
-    <div
-      id="equipment-list"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-    >
-      <!-- Cards are injected here by equipment.js -->
+    <div id="equipment-list"
+         class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     </div>
 
-    </div>
   </main>
+</div>
+
+<!-- ADD EQUIPMENT MODAL - FIXED SIZE -->
+<div id="addEquipmentModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+  <div class="bg-slate-900 rounded-xl w-full max-w-md border border-slate-700 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+    
+    <!-- RED CLOSE BUTTON - Top Right (Inside modal) -->
+    <button id="closeModalTop" class="absolute top-3 right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition z-10">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- MODAL HEADER -->
+    <div class="border-b border-slate-800 p-5">
+      <div class="flex items-center gap-3">
+        <div class="p-2 rounded-lg bg-amber-400/10">
+          <i class="fas fa-truck-monster text-amber-400 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold">Add New Equipment</h3>
+          <p class="text-slate-400 text-xs mt-1">Fill in the equipment details below</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL BODY - FORM -->
+    <form id="addEquipmentForm" class="p-5">
+      <div class="space-y-4">
+        
+        <!-- Equipment Name -->
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">
+            Equipment Name
+          </label>
+          <input
+            type="text"
+            id="equipmentName"
+            name="name"
+            placeholder="e.g., Caterpillar 797F"
+            required
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+          />
+        </div>
+
+        <!-- Equipment ID -->
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">
+            Equipment ID
+          </label>
+          <input
+            type="text"
+            id="equipmentCode"
+            name="code"
+            placeholder="e.g., CAT-797F-001"
+            required
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+          />
+        </div>
+
+        <!-- Equipment Type Dropdown -->
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">
+            Equipment Type
+          </label>
+          <select
+            id="equipmentType"
+            name="type"
+            required
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+          >
+            <option value="" disabled selected>Select type</option>
+            <option value="Excavator">Excavator</option>
+            <option value="Haul Truck">Haul Truck</option>
+            <option value="Drill Jumbo">Drill Jumbo</option>
+            <option value="Scooptram">Scooptram</option>
+            <option value="Articulated Truck">Articulated Truck</option>
+            <option value="Face Drill">Face Drill</option>
+            <option value="Loader">Loader</option>
+            <option value="Dozer">Dozer</option>
+          </select>
+        </div>
+
+        <!-- Health Status -->
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">
+            Health Status
+          </label>
+          <div class="flex gap-3">
+            <div class="flex-1">
+              <div id="healthStatusDisplay" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-emerald-400 font-medium">
+                Good
+              </div>
+            </div>
+            <div class="w-20">
+              <div id="healthStatusIndicator" class="h-full rounded-lg bg-emerald-500 flex items-center justify-center text-xs">
+                <span class="text-black font-bold">100%</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Status is automatically calculated from usage hours</p>
+        </div>
+
+        <!-- Usage Hours and Maintenance Limit -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Total Usage Hours
+            </label>
+            <input
+              type="number"
+              id="usageHours"
+              name="usage_hours"
+              value="0"
+              min="0"
+              max="99999"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Next Service (hours)
+            </label>
+            <input
+              type="number"
+              id="maintenanceLimit"
+              name="maintenance_limit"
+              value="5000"
+              min="100"
+              max="20000"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+            />
+          </div>
+        </div>
+
+        <!-- Last Maintenance Date -->
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-1">
+            Last Maintenance Date
+          </label>
+          <input
+            type="date"
+            id="lastMaintenanceDate"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+          />
+        </div>
+      </div>
+
+      <!-- SUBMIT BUTTONS - NOW VISIBLE -->
+      <div class="flex gap-3 mt-6 pt-5 border-t border-slate-800">
+        <button
+          type="button"
+          id="cancelBtn"
+          class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition text-sm"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="flex-1 bg-amber-400 hover:bg-amber-500 text-black font-semibold py-2 rounded-lg transition text-sm"
+        >
+          Add Equipment
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- LOAD SIDEBAR -->
 <script type="module">
   import { loadSidebar } from "./js/layout.js";
   loadSidebar("equipment");
+</script>
+
+<!-- MODAL SCRIPT -->
+<script>
+// Modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('addEquipmentModal');
+  const openBtn = document.getElementById('openAddModal');
+  const closeBtn = document.getElementById('closeModalTop');
+  const cancelBtn = document.getElementById('cancelBtn');
+  
+  // Open modal
+  if (openBtn) {
+    openBtn.addEventListener('click', function() {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      // Set today's date as default
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('lastMaintenanceDate').value = today;
+      // Focus on first field
+      document.getElementById('equipmentName').focus();
+    });
+  }
+  
+  // Close modal with top red button
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    });
+  }
+  
+  // Close modal with cancel button
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() {
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    });
+  }
+  
+  // Close modal when clicking outside
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+  });
+  
+  // Close modal with ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+  });
+  
+  // Real-time health status calculation
+  const usageInput = document.getElementById('usageHours');
+  const limitInput = document.getElementById('maintenanceLimit');
+  const healthDisplay = document.getElementById('healthStatusDisplay');
+  const healthIndicator = document.getElementById('healthStatusIndicator');
+  
+  function updateHealthStatus() {
+    const usage = parseInt(usageInput.value) || 0;
+    const limit = parseInt(limitInput.value) || 5000;
+    
+    if (limit === 0) return;
+    
+    const percentage = Math.min(Math.round((usage / limit) * 100), 100);
+    
+    let status, color, bgColor;
+    
+    if (percentage >= 100) {
+      status = "Critical";
+      color = "text-red-400";
+      bgColor = "bg-red-500";
+    } else if (percentage >= 75) {
+      status = "Warning";
+      color = "text-amber-400";
+      bgColor = "bg-amber-500";
+    } else {
+      status = "Good";
+      color = "text-emerald-400";
+      bgColor = "bg-emerald-500";
+    }
+    
+    healthDisplay.textContent = status;
+    healthDisplay.className = `bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm font-medium ${color}`;
+    healthIndicator.className = `h-full rounded-lg ${bgColor} flex items-center justify-center text-xs`;
+    healthIndicator.innerHTML = `<span class="text-black font-bold">${percentage}%</span>`;
+  }
+  
+  if (usageInput && limitInput) {
+    usageInput.addEventListener('input', updateHealthStatus);
+    limitInput.addEventListener('input', updateHealthStatus);
+  }
+  
+  // Form submission
+  const form = document.getElementById('addEquipmentForm');
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Convert numeric fields
+      data.usage_hours = parseInt(data.usage_hours) || 0;
+      data.maintenance_limit = parseInt(data.maintenance_limit) || 5000;
+      
+      try {
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = 'Adding...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch('http://127.0.0.1:5000/api/equipment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          // Show success message
+          alert('✅ Equipment added successfully!');
+          modal.classList.remove('flex');
+          modal.classList.add('hidden');
+          
+          // Refresh equipment list
+          if (window.loadEquipment) {
+            window.loadEquipment();
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(`❌ Failed to add equipment: ${errorData.error || 'Server error'}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Failed to add equipment. Please check your connection and backend server.');
+      } finally {
+        // Reset button state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = 'Add Equipment';
+        submitBtn.disabled = false;
+      }
+    });
+  }
+});
 </script>
 
 <!-- LOAD PAGE LOGIC -->
