@@ -44,6 +44,23 @@ def add_equipment():
     db.session.commit()
     return jsonify({"message": "Equipment added successfully", "id": new_equipment.id}), 201
 
+@app.route("/api/equipment/<int:equipment_id>", methods=["GET"])
+def get_equipment_by_id(equipment_id):
+    equipment = Equipment.query.get(equipment_id)
+    if not equipment:
+        return jsonify({"error": "Equipment not found"}), 404
+    
+    result = {
+        "id": equipment.id,
+        "code": equipment.code,
+        "name": equipment.name,
+        "type": equipment.type,
+        "usage_hours": equipment.usage_hours,
+        "maintenance_limit": equipment.maintenance_limit,
+        "status": equipment.calculate_status()
+    }
+    return jsonify(result)
+
 @app.route("/api/equipment/<int:equipment_id>", methods=["PUT"])
 def update_equipment(equipment_id):
     data = request.json
