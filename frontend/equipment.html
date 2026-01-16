@@ -79,6 +79,9 @@
 
     <!-- MODAL BODY - FORM -->
     <form id="addEquipmentForm" class="p-5">
+      <!-- Hidden field for equipment ID when editing -->
+      <input type="hidden" id="equipmentId" name="id" />
+      
       <div class="space-y-4">
         
         <!-- Equipment Name -->
@@ -236,9 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeBtn = document.getElementById('closeModalTop');
   const cancelBtn = document.getElementById('cancelBtn');
   
-  // Open modal
+  // Open modal for ADD
   if (openBtn) {
     openBtn.addEventListener('click', function() {
+      resetModalToAddMode();
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       // Set today's date as default
@@ -254,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBtn.addEventListener('click', function() {
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+      resetModalToAddMode();
     });
   }
   
@@ -262,6 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelBtn.addEventListener('click', function() {
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+      resetModalToAddMode();
     });
   }
   
@@ -270,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target === modal) {
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+      resetModalToAddMode();
     }
   });
   
@@ -278,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
       modal.classList.remove('flex');
       modal.classList.add('hidden');
+      resetModalToAddMode();
     }
   });
   
@@ -322,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
     limitInput.addEventListener('input', updateHealthStatus);
   }
   
-  // Form submission
+  // Form submission (handles both ADD and UPDATE)
   const form = document.getElementById('addEquipmentForm');
   if (form) {
     form.addEventListener('submit', async function(e) {
@@ -330,51 +338,133 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
+      const equipmentId = data.id;
       
-      // Convert numeric fields
-      data.usage_hours = parseInt(data.usage_hours) || 0;
-      data.maintenance_limit = parseInt(data.maintenance_limit) || 5000;
-      
-      try {
-        // Show loading state
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = 'Adding...';
-        submitBtn.disabled = true;
+      // Check if it's an update or add
+      if (equipmentId) {
+        // It's an UPDATE
+        await updateEquipment(e, equipmentId, data);
+      } else {
+        // It's an ADD (original code)
+        // Convert numeric fields
+        data.usage_hours = parseInt(data.usage_hours) || 0;
+        data.maintenance_limit = parseInt(data.maintenance_limit) || 5000;
         
-        const response = await fetch('http://127.0.0.1:5000/api/equipment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        
-        if (response.ok) {
-          // Show success message
-          alert('✅ Equipment added successfully!');
-          modal.classList.remove('flex');
-          modal.classList.add('hidden');
+        try {
+          // Show loading state
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const originalText = submitBtn.innerHTML;
+          submitBtn.innerHTML = 'Adding...';
+          submitBtn.disabled = true;
           
-          // Refresh equipment list
-          if (window.loadEquipment) {
-            window.loadEquipment();
+          const response = await fetch('http://127.0.0.1:5000/api/equipment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+          
+          if (response.ok) {
+            // Show success message
+            alert('✅ Equipment added successfully!');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            
+            // Refresh equipment list
+            if (window.loadEquipment) {
+              window.loadEquipment();
+            }
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            alert(`❌ Failed to add equipment: ${errorData.error || 'Server error'}`);
           }
-        } else {
-          const errorData = await response.json().catch(() => ({}));
-          alert(`❌ Failed to add equipment: ${errorData.error || 'Server error'}`);
+        } catch (error) {
+          console.error('Error:', error);
+          alert('❌ Failed to add equipment. Please check your connection and backend server.');
+        } finally {
+          // Reset button state
+          const submitBtn = form.querySelector('button[type="submit"]');
+          submitBtn.innerHTML = 'Add Equipment';
+          submitBtn.disabled = false;
         }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Failed to add equipment. Please check your connection and backend server.');
-      } finally {
-        // Reset button state
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = 'Add Equipment';
-        submitBtn.disabled = false;
       }
     });
+  }
+  
+  // Function to handle equipment UPDATE
+  async function updateEquipment(e, equipmentId, data) {
+    e.preventDefault();
+    
+    // Remove id from data for the update
+    delete data.id;
+    
+    // Convert numeric fields
+    data.usage_hours = parseInt(data.usage_hours) || 0;
+    data.maintenance_limit = parseInt(data.maintenance_limit) || 5000;
+    
+    try {
+      const submitBtn = document.querySelector('#addEquipmentModal button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Updating...';
+      submitBtn.disabled = true;
+      
+      const response = await fetch(`http://127.0.0.1:5000/api/equipment/${equipmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (response.ok) {
+        // Show success message
+        alert('✅ Equipment updated successfully!');
+        
+        // Close modal
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        
+        // Reset modal to add mode
+        resetModalToAddMode();
+        
+        // Refresh equipment list
+        if (window.loadEquipment) {
+          window.loadEquipment();
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`❌ Failed to update equipment: ${errorData.error || 'Server error'}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Failed to update equipment. Please check your connection.');
+    } finally {
+      const submitBtn = document.querySelector('#addEquipmentModal button[type="submit"]');
+      submitBtn.innerHTML = 'Add Equipment';
+      submitBtn.disabled = false;
+    }
+  }
+  
+  // Function to reset modal to ADD mode
+  function resetModalToAddMode() {
+    document.getElementById('addEquipmentForm').reset();
+    const modalHeader = document.querySelector('#addEquipmentModal h3');
+    const submitBtn = document.querySelector('#addEquipmentModal button[type="submit"]');
+    modalHeader.textContent = 'Add New Equipment';
+    submitBtn.textContent = 'Add Equipment';
+    
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('lastMaintenanceDate').value = today;
+    
+    // Clear hidden ID field
+    document.getElementById('equipmentId').value = '';
+    
+    // Update health status
+    updateHealthStatus();
   }
 });
 </script>

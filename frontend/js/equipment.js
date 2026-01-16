@@ -130,7 +130,7 @@ function renderEquipment(items) {
       </div>
 
       <div class="flex gap-2">
-        <button class="edit-btn flex-1 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg text-sm transition flex items-center justify-center gap-2">
+        <button class="edit-btn flex-1 bg-slate-800 hover:bg-slate-700 py-2 rounded-lg text-sm transition flex items-center justify-center gap-2" data-id="${eq.id}">
           <i class="fas fa-edit"></i> Edit
         </button>
         <button class="delete-btn flex-1 bg-red-900/30 hover:bg-red-800/50 text-red-400 py-2 rounded-lg text-sm transition flex items-center justify-center gap-2" data-id="${eq.id}" data-name="${eq.name}">
@@ -145,6 +145,12 @@ function renderEquipment(items) {
       const id = deleteBtn.getAttribute('data-id');
       const name = deleteBtn.getAttribute('data-name');
       deleteEquipment(id, name);
+    });
+    
+    // Add event listener for EDIT button
+    const editBtn = card.querySelector('.edit-btn');
+    editBtn.addEventListener('click', () => {
+      openEditModal(eq);
     });
 
     list.appendChild(card);
@@ -212,9 +218,43 @@ function deleteEquipment(id, name) {
   });
 }
 
+// Function to open modal in EDIT mode
+function openEditModal(equipment) {
+  const modal = document.getElementById('addEquipmentModal');
+  
+  // Change modal to edit mode
+  const modalHeader = modal.querySelector('h3');
+  const submitBtn = modal.querySelector('button[type="submit"]');
+  modalHeader.textContent = 'Edit Equipment';
+  submitBtn.textContent = 'Update Equipment';
+  
+  // Fill form with equipment data
+  document.getElementById('equipmentId').value = equipment.id;
+  document.getElementById('equipmentName').value = equipment.name;
+  document.getElementById('equipmentCode').value = equipment.code;
+  document.getElementById('equipmentType').value = equipment.type;
+  document.getElementById('usageHours').value = equipment.usage_hours;
+  document.getElementById('maintenanceLimit').value = equipment.maintenance_limit;
+  
+  // Set today's date as default for last maintenance
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('lastMaintenanceDate').value = today;
+  
+  // Update health status display
+  if (typeof updateHealthStatus === 'function') {
+    updateHealthStatus();
+  }
+  
+  // Open modal
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  
+  // Focus on first field
+  document.getElementById('equipmentName').focus();
+}
+
 // Notification function
 function showNotification(message, type = 'info') {
-  // You can reuse the toast from modal or create a simple one
   const toast = document.createElement('div');
   toast.className = `fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 ${
     type === 'success' ? 'bg-emerald-900/90 text-emerald-100 border border-emerald-700' : 
@@ -246,3 +286,4 @@ function showNotification(message, type = 'info') {
 // Make functions available globally
 window.loadEquipment = loadEquipment;
 window.renderEquipment = renderEquipment;
+window.openEditModal = openEditModal; // Make edit function available globally
