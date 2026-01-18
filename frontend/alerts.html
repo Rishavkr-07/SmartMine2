@@ -5,13 +5,88 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alerts | SmartMine</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-950 text-slate-200">
   <div class="flex min-h-screen">
     <div id="sidebar"></div>
+    
     <main class="flex-1 p-8 bg-gradient-to-br from-slate-950 to-slate-900">
-      <h1 class="text-2xl font-bold mb-6">System Alerts</h1>
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold">System Alerts</h1>
+        <p class="text-slate-400 text-sm">Active warnings and critical equipment alerts</p>
+      </div>
+
+      <!-- Alert Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-400 text-sm mb-1">Total Alerts</p>
+              <p class="text-3xl font-bold" id="total-alerts">0</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-amber-400/10 flex items-center justify-center">
+              <i class="fas fa-bell text-amber-400 text-xl"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-slate-900 border border-amber-500/30 rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-400 text-sm mb-1">Warning Alerts</p>
+              <p class="text-3xl font-bold text-amber-400" id="warning-alerts">0</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-amber-400/10 flex items-center justify-center">
+              <i class="fas fa-exclamation-triangle text-amber-400 text-xl"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-slate-900 border border-red-500/30 rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-400 text-sm mb-1">Critical Alerts</p>
+              <p class="text-3xl font-bold text-red-400" id="critical-alerts">0</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-red-400/10 flex items-center justify-center">
+              <i class="fas fa-skull-crossbones text-red-400 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="flex gap-4 mb-8">
+        <button id="filter-all" class="px-4 py-2 bg-amber-400 text-black rounded-lg font-medium hover:bg-amber-500 transition">
+          All Alerts
+        </button>
+        <button id="filter-warning" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition">
+          Warnings Only
+        </button>
+        <button id="filter-critical" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition">
+          Critical Only
+        </button>
+      </div>
+
+      <!-- Alerts Container -->
       <div id="alert-list" class="space-y-4"></div>
+
+      <!-- No Alerts State -->
+      <div id="no-alerts" class="hidden text-center py-16">
+        <div class="inline-block p-8 bg-slate-900/50 rounded-2xl border border-slate-800">
+          <i class="fas fa-check-circle text-emerald-400 text-5xl mb-4"></i>
+          <h3 class="text-xl font-semibold mb-2">No Active Alerts</h3>
+          <p class="text-slate-400 mb-6">All equipment is operating normally</p>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-400 mb-4"></div>
+        <p class="text-slate-400">Loading alerts...</p>
+      </div>
     </main>
   </div>
 
