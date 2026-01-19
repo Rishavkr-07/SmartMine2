@@ -5,17 +5,175 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maintenance | SmartMine</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-950 text-slate-200">
   <div class="flex min-h-screen">
     <div id="sidebar"></div>
     <main class="flex-1 p-8 bg-gradient-to-br from-slate-950 to-slate-900">
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold">Maintenance History</h1>
-        <p class="text-slate-400 text-sm">Logged maintenance activities</p>
+      <!-- Header with Add Button -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">Maintenance History</h1>
+          <p class="text-slate-400 text-sm">Logged maintenance activities</p>
+        </div>
+        <button id="openAddMaintenanceModal" class="bg-amber-400 text-black px-4 py-2 rounded-lg font-semibold hover:bg-amber-500 transition">
+          <i class="fas fa-plus mr-2"></i> Add Maintenance
+        </button>
       </div>
+
+      <!-- Maintenance List Container -->
       <div id="maintenance-list" class="space-y-4"></div>
     </main>
+  </div>
+
+  <!-- Add Maintenance Modal -->
+  <div id="addMaintenanceModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 rounded-xl w-full max-w-md border border-slate-700 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+      
+      <!-- Close Button -->
+      <button id="closeMaintenanceModal" class="absolute top-3 right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition z-10">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="border-b border-slate-800 p-5">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-amber-400/10">
+            <i class="fas fa-tools text-amber-400 text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">Add Maintenance Record</h3>
+            <p class="text-slate-400 text-xs mt-1">Log a new maintenance activity</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body - Form -->
+      <form id="addMaintenanceForm" class="p-5">
+        <div class="space-y-4">
+          
+          <!-- Equipment Selection -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Equipment *
+            </label>
+            <select 
+              id="equipmentSelect" 
+              name="equipment_id" 
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400">
+              <option value="" disabled selected>Select equipment...</option>
+              <!-- Equipment options will be loaded by JavaScript -->
+            </select>
+          </div>
+
+          <!-- Service Date -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Service Date *
+            </label>
+            <input
+              type="date"
+              id="serviceDate"
+              name="service_date"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+            />
+          </div>
+
+          <!-- Maintenance Type -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Maintenance Type *
+            </label>
+            <select 
+              id="maintenanceType" 
+              name="maintenance_type" 
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400">
+              <option value="" disabled selected>Select type...</option>
+              <option value="Routine Inspection">Routine Inspection</option>
+              <option value="Preventive Maintenance">Preventive Maintenance</option>
+              <option value="Corrective Maintenance">Corrective Maintenance</option>
+              <option value="Emergency Repair">Emergency Repair</option>
+              <option value="Engine Overhaul">Engine Overhaul</option>
+              <option value="Hydraulic Service">Hydraulic Service</option>
+              <option value="Brake Inspection">Brake Inspection</option>
+              <option value="Electrical Repair">Electrical Repair</option>
+              <option value="Lubrication Service">Lubrication Service</option>
+              <option value="Tire Replacement">Tire Replacement</option>
+            </select>
+          </div>
+
+          <!-- Technician -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Technician *
+            </label>
+            <input
+              type="text"
+              id="technician"
+              name="technician"
+              placeholder="e.g., John Smith"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+            />
+          </div>
+
+          <!-- Current Usage Hours -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Current Usage Hours *
+            </label>
+            <input
+              type="number"
+              id="usageAtService"
+              name="usage_at_service"
+              min="0"
+              max="99999"
+              required
+              placeholder="Enter current hours"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400"
+            />
+            <p class="text-xs text-slate-400 mt-1">Current equipment hours at time of service</p>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">
+              Description *
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              rows="3"
+              placeholder="Describe the maintenance performed, parts replaced, issues found..."
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-400 resize-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex gap-3 mt-6 pt-5 border-t border-slate-800">
+          <button
+            type="button"
+            id="cancelMaintenanceBtn"
+            class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="submitMaintenanceBtn"
+            class="flex-1 bg-amber-400 hover:bg-amber-500 text-black font-semibold py-2 rounded-lg transition text-sm"
+          >
+            Add Maintenance Record
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script type="module">
